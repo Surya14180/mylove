@@ -1,0 +1,145 @@
+{% extends 'mystery/base.html' %}
+
+{% block extra_css %}
+<style>
+    .puzzle-container {
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .puzzle-title {
+        font-size: 2.5rem;
+        color: #00fffc;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 10px #00fffc;
+    }
+
+    .puzzle-content {
+        background: rgba(0, 255, 252, 0.1);
+        border: 2px solid #00fffc;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .puzzle-riddle {
+        font-size: 1.5rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .answer-input {
+        background: transparent;
+        border: 2px solid #00fffc;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+        border-radius: 5px;
+    }
+
+    .answer-input:focus {
+        outline: none;
+        box-shadow: 0 0 10px #00fffc;
+    }
+
+    .submit-btn {
+        background: transparent;
+        border: 2px solid #00fffc;
+        color: #00fffc;
+        padding: 0.5rem 2rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+    }
+
+    .submit-btn:hover {
+        background: #00fffc;
+        color: #000;
+    }
+
+    .hint {
+        color: #666;
+        font-style: italic;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .hint:hover {
+        color: #00fffc;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="puzzle-container">
+    <h1 class="puzzle-title">Level 1: The First Mystery</h1>
+    <div class="puzzle-content">
+        <p class="puzzle-riddle">
+            I am the center of everything you feel,<br>
+            Yet you cannot touch me, I'm not real.<br>
+            I can be broken, but never fixed,<br>
+            I can be given, but never mixed.<br>
+            When drawn, I look like two curves that meet,<br>
+            In love's symbol, I am complete.<br>
+            What am I?
+        </p>
+        <div>
+            <input type="text" class="answer-input" id="answer" placeholder="Your answer...">
+            <button class="submit-btn" onclick="checkAnswer()">Submit</button>
+        </div>
+        <p class="hint" onclick="showHint()">HINT kavalaa bangaram 🌚🌚🌚</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showHint() {
+        alert("Think about the symbol of love==>❤️");
+    }
+
+    function checkAnswer() {
+        const answer = document.getElementById('answer').value.toLowerCase().trim();
+        
+        fetch('{% url "puzzle_level_1" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: `answer=${answer}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Correct! Moving to the next level...");
+                window.location.href = '{% url "puzzle_level_2" %}';
+            } else {
+                alert("That's not quite right. Try again!");
+            }
+        });
+    }
+
+    // Handle Enter key
+    document.getElementById('answer').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+</script>
+{% endblock %} 

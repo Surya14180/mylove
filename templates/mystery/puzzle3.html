@@ -1,0 +1,209 @@
+{% extends 'mystery/base.html' %}
+
+{% block extra_css %}
+<style>
+    .puzzle-container {
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .puzzle-title {
+        font-size: 2.5rem;
+        color: #00fffc;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 10px #00fffc;
+    }
+
+    .puzzle-content {
+        background: rgba(0, 255, 252, 0.1);
+        border: 2px solid #00fffc;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .puzzle-riddle {
+        font-size: 1.5rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .scrambled-letters {
+        font-size: 2.5rem;
+        color: #00fffc;
+        margin: 2rem 0;
+        letter-spacing: 10px;
+        font-family: monospace;
+    }
+
+    .letter-box {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        border: 2px solid #00fffc;
+        margin: 0 5px;
+        line-height: 46px;
+        text-align: center;
+        font-size: 2rem;
+        color: #00fffc;
+        text-shadow: 0 0 5px #00fffc;
+    }
+
+    .answer-input {
+        background: transparent;
+        border: 2px solid #00fffc;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+        border-radius: 5px;
+    }
+
+    .answer-input:focus {
+        outline: none;
+        box-shadow: 0 0 10px #00fffc;
+    }
+
+    .submit-btn {
+        background: transparent;
+        border: 2px solid #00fffc;
+        color: #00fffc;
+        padding: 0.5rem 2rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+    }
+
+    .submit-btn:hover {
+        background: #00fffc;
+        color: #000;
+    }
+
+    .hint {
+        color: #666;
+        font-style: italic;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .hint:hover {
+        color: #00fffc;
+    }
+
+    .matrix-rain {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="puzzle-container">
+    <h1 class="puzzle-title">Level 3: The Final Mystery</h1>
+    <div class="puzzle-content">
+        <p class="puzzle-riddle">
+            Hidden in these scrambled letters lies<br>
+            A name that makes my heart arise<br>
+            Four letters hold the key to all<br>
+            Unscramble them, and you'll recall<br>
+            The one for whom this quest was made<br>
+            Whose special day we'll soon parade
+        </p>
+        <div class="scrambled-letters">
+            <div class="letter-box">A</div>
+            <div class="letter-box">H</div>
+            <div class="letter-box">S</div>
+            <div class="letter-box">U</div>
+        </div>
+        <div>
+            <input type="text" class="answer-input" id="answer" placeholder="Your answer...">
+            <button class="submit-btn" onclick="checkAnswer()">Submit</button>
+        </div>
+        <p class="hint" onclick="showHint()">HINT kavalaa bangaram 🌚🌚🌚</p>
+    </div>
+</div>
+
+<canvas id="matrixRain" class="matrix-rain"></canvas>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showHint() {
+        alert("The first letter of your name... 🌟");
+    }
+
+    function checkAnswer() {
+        const answer = document.getElementById('answer').value.toLowerCase().trim();
+        
+        fetch('{% url "puzzle_level_3" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: `answer=${answer}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Congratulations! You've solved all the puzzles!");
+                window.location.href = '{% url "reveal_page" %}';
+            } else {
+                alert("Almost there... Try again!");
+            }
+        });
+    }
+
+    // Matrix rain animation
+    const canvas = document.getElementById('matrixRain');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+
+    for (let i = 0; i < columns; i++) {
+        drops[i] = 1;
+    }
+
+    function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#0F0';
+        ctx.font = fontSize + 'px monospace';
+
+        for (let i = 0; i < drops.length; i++) {
+            const text = letters[Math.floor(Math.random() * letters.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+
+    setInterval(draw, 33);
+
+    // Handle Enter key
+    document.getElementById('answer').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+</script>
+{% endblock %} 

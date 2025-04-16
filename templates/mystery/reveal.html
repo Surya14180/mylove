@@ -1,0 +1,169 @@
+{% extends 'mystery/base.html' %}
+
+{% block extra_css %}
+<style>
+    .reveal-container {
+        text-align: center;
+        opacity: 0;
+        transition: opacity 2s ease-in-out;
+    }
+
+    .birthday-title {
+        font-size: 4rem;
+        font-weight: bold;
+        color: #00fffc;
+        text-shadow: 0 0 10px #00fffc;
+        margin-bottom: 2rem;
+    }
+
+    .birthday-message {
+        font-size: 1.5rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .photo-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .photo-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        transform-style: preserve-3d;
+        transform: perspective(1000px);
+    }
+
+    .photo-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .photo-item:hover img {
+        transform: scale(1.1);
+    }
+
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background-color: #f00;
+        opacity: 0;
+    }
+
+    @keyframes confetti-fall {
+        0% {
+            transform: translateY(-100vh) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    
+    .locked-message {
+        text-align: center;
+        margin-top: 2rem;
+        color: #00fffc;
+        font-size: 1.5rem;
+    }
+    
+    .locked-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #00fffc;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if can_reveal %}
+<div class="reveal-container" id="revealContent">
+    <h1 class="birthday-title"> Advance Happy Birthday AMMULUUUU😘🖤!</h1>
+    <div class="birthday-message">
+         <p>My heart's been counting down the days... and now we're almost there!</p>
+         <p>Advance Happy Birthday, SENORITA 🖤🖤🖤! I've been waiting for April 18th like it's my favorite festival—because it truly is. Your special day means the world to me.</p> 
+         <p>Your smile lights up my world, your laughter is the rhythm that makes my heart dance,</p> 
+         <p>and your love turns every moment into a dream I never want to end.</p> 
+         <p>This year, I've got one BIG surprise waiting for you—something to make your birthday feel even more magical ✨</p> 
+         <p>So get ready for April 18th... because it's going to be unforgettable!</p> 
+         <p>LOVE YOU TO THE MOON AND BACK 💖💖💖</p>
+        
+    </div>
+    
+    <div class="photo-gallery">
+        <!-- Add your photos here -->
+        <div class="photo-item" data-tilt>
+            <img src="/static/mystery/1.jpg" alt="Memory 1">
+        </div>
+        <div class="photo-item" data-tilt>
+            <img src="/static/mystery/2.jpg" alt="Memory 2">
+        </div>
+        <div class="photo-item" data-tilt>
+            <img src="/static/mystery/3.jpg" alt="Memory 3">
+        </div>
+        <div class="photo-item" data-tilt>
+            <img src="/static/mystery/4.jpg" alt="Memory 3">
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="locked-message">
+    <div class="locked-icon">🔒</div>
+    <h2>The secret is still locked...</h2>
+    <p>This special message will be revealed on April 18, 2025.</p>
+    <p>Complete all the puzzles to unlock this message!</p>
+    <a href="{% url 'landing_page' %}" class="mystery-btn">Return to Puzzles</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if can_reveal %}
+<script>
+    // Initialize Vanilla-tilt
+    VanillaTilt.init(document.querySelectorAll(".photo-item"), {
+        max: 25,
+        speed: 400,
+        glare: true,
+        "max-glare": 0.5
+    });
+
+    // Show content with fade-in
+    document.getElementById('revealContent').style.opacity = '1';
+
+    // Confetti animation
+    function createConfetti() {
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'];
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animation = `confetti-fall ${Math.random() * 3 + 2}s linear forwards`;
+        document.body.appendChild(confetti);
+
+        setTimeout(() => {
+            confetti.remove();
+        }, 5000);
+    }
+
+    // Create confetti every 100ms
+    setInterval(createConfetti, 100);
+
+    // Birthday music
+    const birthdayMusic = new Howl({
+        src: ['/static/mystery/HBD.m4a'],
+        loop: true,
+        volume: 0.5
+    });
+    birthdayMusic.play();
+</script>
+{% endif %}
+{% endblock %} 

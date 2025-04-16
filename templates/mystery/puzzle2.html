@@ -1,0 +1,152 @@
+{% extends 'mystery/base.html' %}
+
+{% block extra_css %}
+<style>
+    .puzzle-container {
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .puzzle-title {
+        font-size: 2.5rem;
+        color: #00fffc;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 10px #00fffc;
+    }
+
+    .puzzle-content {
+        background: rgba(0, 255, 252, 0.1);
+        border: 2px solid #00fffc;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .puzzle-riddle {
+        font-size: 1.5rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .morse-code {
+        font-family: monospace;
+        font-size: 2rem;
+        color: #00fffc;
+        margin: 2rem 0;
+        letter-spacing: 5px;
+    }
+
+    .answer-input {
+        background: transparent;
+        border: 2px solid #00fffc;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+        border-radius: 5px;
+    }
+
+    .answer-input:focus {
+        outline: none;
+        box-shadow: 0 0 10px #00fffc;
+    }
+
+    .submit-btn {
+        background: transparent;
+        border: 2px solid #00fffc;
+        color: #00fffc;
+        padding: 0.5rem 2rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+    }
+
+    .submit-btn:hover {
+        background: #00fffc;
+        color: #000;
+    }
+
+    .hint {
+        color: #666;
+        font-style: italic;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .hint:hover {
+        color: #00fffc;
+    }
+
+    .digital-display {
+        font-family: 'Digital', monospace;
+        font-size: 3rem;
+        color: #00fffc;
+        text-shadow: 0 0 10px #00fffc;
+        margin: 2rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="puzzle-container">
+    <h1 class="puzzle-title">Level 2: The Digital Code</h1>
+    <div class="puzzle-content">
+        <p class="puzzle-riddle">
+            In the language of love, I am a code<br>
+            Three digits that mean more than they show<br>
+            First comes one, then comes four<br>
+            Add three to complete what I'm waiting for<br>
+            What's the number that means "I Love You"?
+        </p>
+        <div class="digital-display">
+            1 _ 3
+        </div>
+        <div>
+            <input type="text" class="answer-input" id="answer" placeholder="Your answer...">
+            <button class="submit-btn" onclick="checkAnswer()">Submit</button>
+        </div>
+        <p class="hint" onclick="showHint()">HINT kavalaa bangaram 🌚🌚🌚</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showHint() {
+        alert("Think about texting in the old days... What number did you press 4 times to type 'I'?");
+    }
+
+    function checkAnswer() {
+        const answer = document.getElementById('answer').value.toLowerCase().trim();
+        
+        fetch('{% url "puzzle_level_2" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: `answer=${answer}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Brilliant! One step closer to the truth...");
+                window.location.href = '{% url "puzzle_level_3" %}';
+            } else {
+                alert("Not quite... Keep trying!");
+            }
+        });
+    }
+
+    // Handle Enter key
+    document.getElementById('answer').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+</script>
+{% endblock %} 

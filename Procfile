@@ -1,0 +1,1 @@
+web: gunicorn birthday_mystery.wsgi:application 
